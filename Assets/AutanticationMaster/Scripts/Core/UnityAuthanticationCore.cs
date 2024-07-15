@@ -1,18 +1,51 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class UnityAuthanticationCore : MonoBehaviour
+namespace AutanticationMaster.Core
 {
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
+	public class UnityAuthanticationCore : MonoBehaviour
+	{
+		[SerializeField] GameObject LoadingIcon;
+		UnityAuthanticationEvents authanticationEvents;
+		AnonymousSignIn anonymousSignIn;
+		public bool IsInitialized { get; private set; } = false;
+		private void Awake()
+		{
+			authanticationEvents =GetComponent<UnityAuthanticationEvents>();
+			Initialize();
+		}
+		public void Initialize()
+		{
+			UnityServicesInitlizer unityServicesInitlizer = new UnityServicesInitlizer();
+			unityServicesInitlizer.Initialize(OnUnityServicesInitlized);
+		}
+		void OnUnityServicesInitlized()
+		{
+			IsInitialized = true;
+			authanticationEvents.SetupEvents();
+		}
+		public void AnonymousSingIn()
+		{
+			if(TryGetComponent<AnonymousSignIn>(out anonymousSignIn)){
+				ShowLoadingIcon();
+				anonymousSignIn.SignIn(OnSignedIn);
+			}
+		}
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+		private void OnSignedIn()
+		{
+			HideLoadingIcon();
+		}
+
+		void ShowLoadingIcon()
+		{
+			LoadingIcon.SetActive(true);
+		}
+		void HideLoadingIcon()
+		{
+			LoadingIcon.SetActive(false);
+		}
+	}
 }
